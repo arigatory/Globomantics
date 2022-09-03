@@ -162,14 +162,14 @@ WHERE UserId = @UserId",
             {
                 throw new ArgumentNullException(nameof(userId));
             }
-
             if (userId == "3")
             {
                 return new CustomUser
                 {
+                    UserId = 3,
                     LoginName = "kim@mars.com",
                     Email = "kim@mars.com",
-                    PasswordHash = "AQAAAAEAACcQAAAAEPM90mY7B/kfJPVkb37XyCsmif0HFpRoPiQPgGhVoUeFMW34kjqXeaDbwpAzzYQhLg==",
+                    PasswordHash = "AQAAAAEAACcQAAAAEPM9OmY7B/KfJPVkb37XyCsmifOHFpRoPiQPgGhVo4eFMW34kjqXeaDbwpAzzYQhLg==",
                     EmailConfirmed = true
                 };
             }
@@ -192,9 +192,10 @@ WHERE UserId = @UserId",
             {
                 return new CustomUser
                 {
+                    UserId = 3,
                     LoginName = "kim@mars.com",
                     Email = "kim@mars.com",
-                    PasswordHash = "AQAAAAEAACcQAAAAEPM90mY7B/kfJPVkb37XyCsmif0HFpRoPiQPgGhVoUeFMW34kjqXeaDbwpAzzYQhLg==",
+                    PasswordHash = "AQAAAAEAACcQAAAAEPM9OmY7B/KfJPVkb37XyCsmifOHFpRoPiQPgGhVo4eFMW34kjqXeaDbwpAzzYQhLg==",
                     EmailConfirmed = true
                 };
             }

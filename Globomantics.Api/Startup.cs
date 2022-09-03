@@ -46,18 +46,17 @@ namespace Globomantics.Api
         }
 
         public void Configure(IApplicationBuilder app, IApiVersionDescriptionProvider provider)
-        {
+        {            
             var virtualPath = "/api";
             app.Map(virtualPath, builder =>
             {
-                builder.UseApiExceptionHandler();
-
+                builder.UseApiExceptionHandler();  // defined locally
+               
                 builder.UseForwardedHeaders(new ForwardedHeadersOptions
                 {
                     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
                 });
-
-
+                
                 var corsOrigins = Configuration.GetValue<string>("CORSOrigins").Split(",");
                 if (corsOrigins.Any())
                 {
@@ -67,14 +66,10 @@ namespace Globomantics.Api
                         .AllowAnyMethod());
                 }
 
-                builder
-                .UseSwaggerDocumentation(virtualPath, Configuration, provider)
-                .UseHsts()
-                .UseHttpsRedirection()
-                .UseAuthentication()
-                .UseGlobomanticsStyleRequestLogging()
-                .UseRouting();
-
+                builder.UseSwaggerDocumentation(virtualPath, Configuration, provider);
+                builder.UseAuthentication();
+                builder.UseGlobomanticsStyleRequestLogging();
+                builder.UseRouting();
                 builder.UseAuthorization();
                 builder.UseEndpoints(endpoints =>
                 {
@@ -82,9 +77,6 @@ namespace Globomantics.Api
                     endpoints.MapHealthChecks("/health");
                 });
             });
-
-            app.UseApiExceptionHandler();  // defined locally
-
         }
     }
 }
