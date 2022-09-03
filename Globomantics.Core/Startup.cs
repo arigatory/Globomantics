@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -115,8 +116,16 @@ namespace Globomantics.Core
         {
             app.UseExceptionHandler("/Error");
 
-            app.UseHsts();
-            app.UseHttpsRedirection();
+            var forwadedHeaderOptions = new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            };
+            forwadedHeaderOptions.KnownNetworks.Clear();
+            forwadedHeaderOptions.KnownProxies.Clear();
+            app.UseForwardedHeaders(forwadedHeaderOptions);
+
+            //app.UseHsts();
+            //app.UseHttpsRedirection();
 
             app.UseStaticFiles();
             app.UseSerilogRequestLogging(opts =>

@@ -2,6 +2,7 @@ using System.Linq;
 using Globomantics.Api.Extenstions;
 using Globomantics.Api.Middleware;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -46,31 +47,44 @@ namespace Globomantics.Api
 
         public void Configure(IApplicationBuilder app, IApiVersionDescriptionProvider provider)
         {
-            app.UseApiExceptionHandler();  // defined locally
-
-            var corsOrigins = Configuration.GetValue<string>("CORSOrigins").Split(",");
-            if (corsOrigins.Any())
+            var virtualPath = "/api";
+            app.Map(virtualPath, builder =>
             {
-                app.UseCors(builder => builder
-                    .WithOrigins(corsOrigins)
-                    .AllowAnyHeader()
-                    .AllowAnyMethod());
-            }
+                builder.UseApiExceptionHandler();
 
-            app
-                .UseSwaggerDocumentation(Configuration, provider)
+                builder.UseForwardedHeaders(new ForwardedHeadersOptions
+                {
+                    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+                });
+
+
+                var corsOrigins = Configuration.GetValue<string>("CORSOrigins").Split(",");
+                if (corsOrigins.Any())
+                {
+                    builder.UseCors(builder => builder
+                        .WithOrigins(corsOrigins)
+                        .AllowAnyHeader()
+                        .AllowAnyMethod());
+                }
+
+                builder
+                .UseSwaggerDocumentation(virtualPath, Configuration, provider)
                 .UseHsts()
                 .UseHttpsRedirection()
                 .UseAuthentication()
                 .UseGlobomanticsStyleRequestLogging()
                 .UseRouting();
 
-            app.UseAuthorization();
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers().RequireAuthorization();
-                endpoints.MapHealthChecks("/health");
+                builder.UseAuthorization();
+                builder.UseEndpoints(endpoints =>
+                {
+                    endpoints.MapControllers().RequireAuthorization();
+                    endpoints.MapHealthChecks("/health");
+                });
             });
+
+            app.UseApiExceptionHandler();  // defined locally
+
         }
     }
 }
