@@ -67,5 +67,15 @@ services:
     networks:
       - globonet
 
+  globosql:
+    image: arigatory/globomatics_database
+    restart: always
+    ports:
+      - "1435:1433"
+    networks:
+      - globonet
+
+
+
 networks:
   globonet: {}
